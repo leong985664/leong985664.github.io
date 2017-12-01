@@ -109,7 +109,7 @@ class Stats {
             let rowdiv = d3.select("#"+row);
             for (let i = 1; i <= 4; i++) {
                 let div = rowdiv.append("div")
-                    .attr("class", "col-xl-3");
+                    .attr("class", "col-md-3");
 
                 let svg = div.append("svg")
                     .attr("id", row+i)

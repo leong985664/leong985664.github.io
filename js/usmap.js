@@ -224,7 +224,7 @@ class Usmap{
     updateInfo(d) {
 
         let card = d3.select("#paneldiv")
-            .attr("class", "col-xl-3 card panelafter")
+            .attr("class", "col-xl-3 card panel panelafter")
         let title = d3.select("#card_title")
             .text(d.name)
         let code = d3.select("#card_code")
