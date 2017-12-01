@@ -146,6 +146,7 @@ nobutton{
 
 .ArrDelayTime {
     stroke: crimson;
+    stroke-width: 2px;
 }
 
 .dashedtick {
