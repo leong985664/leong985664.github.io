@@ -153,6 +153,12 @@ nobutton{
     stroke-dasharray: 1, 3;
 }
 
+.linenode {
+    /*stroke-width: 1px;*/
+    /*stroke: black;*/
+    fill: black;
+}
+
 /*bar chart*/
 
 .bar1{

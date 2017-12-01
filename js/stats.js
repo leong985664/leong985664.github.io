@@ -118,7 +118,7 @@ class Stats {
                 svg.append("g").attr("id", row+i+"x")
                 svg.append("g").attr("id", row+i+"y")
                 let temp = svg.append("g").attr("id", row+i+"z")
-                if (i == 1 || i == 2) {
+                if (i == 1 || i == 2 || i == 3) {
                     temp.append("g").attr("id", row+i+"z1")
                     temp.append("g").attr("id", row+i+"z2")
                 }
@@ -366,13 +366,14 @@ class Stats {
             }))
             .range([0, width*0.8])
         let xAxis = d3.axisBottom()
+            .tickSize(-height / 1.2)
             .scale(xScale)
 
         let limit = 20;
 
         let yScale = d3.scaleLinear()
-            .domain([limit, -limit])
-            .range([0, height*0.8])
+            .domain([-limit, limit])
+            .range([height*0.8, 0])
         let yAxis = d3.axisLeft()
             .tickSize(-width)
             .scale(yScale)
@@ -418,9 +419,20 @@ class Stats {
             .attr("class", "texttoberemoved")
             .text("average delay (min)")
 
+        //creading tooltip
+        let tip = d3.tip()
+            .attr('class', 'chart-tip')
+            .offset([-40, 0])
+            .html(function(d) {
+                console.log(d)
+                return "<span><strong>Dep Delay: </strong>"+ parseFloat(d.DepDelay).toFixed(2) +"min</span><br>"+
+                    "<span><strong>Arr Delay: </strong>"+ parseFloat(d.ArrDelay).toFixed(2) +"min</span>";
+            })
+        svg.call(tip);
+
         //setup line chart
         let linesgroup = d3.select("#"+name+"z")
-            .attr("transform", "translate("+(width*0.1+width*0.4/data.length)+", "+height*0.95+") scale(1,-1)");
+            .attr("transform", "translate("+(width*0.1+width*0.4/data.length)+", "+height*0.15+")");
 
         let depGenerator = d3.line()
             .x(d => xScale(d.Time))
@@ -445,6 +457,34 @@ class Stats {
             .transition()
             .duration(1000)
             .attr("d", d => d.value);
+
+        //draw nodes
+        let nodes1 = d3.select("#"+name+"z1").selectAll("circle")
+            .data(data)
+        nodes1.exit().remove();
+        nodes1 = nodes1.enter().append("circle").merge(nodes1)
+            .attr("cx", d => xScale(d.Time))
+            .on("mouseover", tip.show)
+            .on("mouseout", tip.hide)
+            .transition()
+            .duration(1000)
+            .attr("cy", d => yScale(d.DepDelay))
+            .attr("r", 3)
+            .attr("class", "linenode")
+
+
+        let nodes2 = d3.select("#"+name+"z2").selectAll("circle")
+            .data(data)
+        nodes2.exit().remove();
+        nodes2 = nodes2.enter().append("circle").merge(nodes2)
+            .attr("cx", d => xScale(d.Time))
+            .on("mouseover", tip.show)
+            .on("mouseout", tip.hide)
+            .transition()
+            .duration(1000)
+            .attr("cy", d => yScale(d.ArrDelay))
+            .attr("r", 3)
+            .attr("class", "linenode")
     }
 
     updateAreaChart(name, data){
@@ -542,6 +582,8 @@ class Stats {
 
         for (let item of ["month", "day", "hour"]) {
             d3.select("#" + item + "3y").selectAll(".tick")
+                .attr("class", "dashedtick")
+            d3.select("#" + item + "3x").selectAll(".tick")
                 .attr("class", "dashedtick")
         }
     }
