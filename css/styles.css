@@ -317,6 +317,16 @@ nobutton{
     font-weight: bold;
 }
 
+.chart-tip {
+    /*line-height: 1;*/
+    /*font-weight: bold;*/
+    font-size: 0.5rem;
+    padding: 6px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-radius: 2px;
+}
+
 h7 {
     margin-bottom: 0.5rem;
     font-family: inherit;

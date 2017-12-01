@@ -199,6 +199,16 @@ class Stats {
             .attr("class", "texttoberemoved")
             .text("number of flight")
 
+        //creading tooltip
+        let tip = d3.tip()
+            .attr('class', 'chart-tip')
+            .offset([-80, 0])
+            .html(function(d) {
+                return "<span><strong>Total Flights: </strong>"+ d.Count +"</span><br>"+
+                    "<span><strong>15+min Delay: </strong>"+ (d["15minDepDelay"] * 100).toFixed(2)+"%</span>"
+            })
+        svg.call(tip);
+
         //draw bar chart1
         let barsgroup = d3.select("#"+name+"z1")
             .attr("transform", "translate("+(width*0.1+width*0.05/data.length)+", "+height*0.95+") scale(1,-1)");
@@ -208,12 +218,15 @@ class Stats {
         bars.exit().remove();
         bars = bars.enter().append("rect").merge(bars)
             .attr("x", d => xScale(d.Time))
+            .on("mouseover", tip.show)
+            .on("mouseout", tip.hide)
             .transition()
             .duration(1000)
             .attr("y", 0)
             .attr("width", width * 0.7 / data.length)
             .attr("height", d => (height*0.8 - yScale(parseInt(d.Count))))
             .attr("class", "bar1")
+
 
         //draw bar chart2
         let barsgroup2 = d3.select("#"+name+"z2")
@@ -224,6 +237,8 @@ class Stats {
         bars2.exit().remove();
         bars2 = bars2.enter().append("rect").merge(bars2)
             .attr("x", d => xScale(d.Time))
+            .on("mouseover", tip.show)
+            .on("mouseout", tip.hide)
             .transition()
             .duration(1000)
             .attr("y", 0)
@@ -293,6 +308,16 @@ class Stats {
             .attr("class", "texttoberemoved")
             .text("number of flight")
 
+        //creading tooltip
+        let tip = d3.tip()
+            .attr('class', 'chart-tip')
+            .offset([-80, 0])
+            .html(function(d) {
+                return "<span><strong>Total Flights: </strong>"+ d.Count +"</span><br>"+
+                    "<span><strong>15+min Delay: </strong>"+ (d["15minArrDelay"] * 100).toFixed(2)+"%</span>"
+            })
+        svg.call(tip);
+
         //draw bar chart1
         let barsgroup = d3.select("#"+name+"z1")
             .attr("transform", "translate("+(width*0.1+width*0.05/data.length)+", "+height*0.95+") scale(1,-1)");
@@ -302,6 +327,8 @@ class Stats {
         bars.exit().remove();
         bars = bars.enter().append("rect").merge(bars)
             .attr("x", d => xScale(d.Time))
+            .on("mouseover", tip.show)
+            .on("mouseout", tip.hide)
             .transition()
             .duration(1000)
             .attr("y", 0)
@@ -318,6 +345,8 @@ class Stats {
         bars2.exit().remove();
         bars2 = bars2.enter().append("rect").merge(bars2)
             .attr("x", d => xScale(d.Time))
+            .on("mouseover", tip.show)
+            .on("mouseout", tip.hide)
             .transition()
             .duration(1000)
             .attr("y", 0)
