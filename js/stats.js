@@ -366,7 +366,7 @@ class Stats {
             }))
             .range([0, width*0.8])
         let xAxis = d3.axisBottom()
-            .tickSize(-height / 1.2)
+            // .tickSize(-height / 1.2)
             .scale(xScale)
 
         let limit = 20;
@@ -463,11 +463,11 @@ class Stats {
             .data(data)
         nodes1.exit().remove();
         nodes1 = nodes1.enter().append("circle").merge(nodes1)
-            .attr("cx", d => xScale(d.Time))
             .on("mouseover", tip.show)
             .on("mouseout", tip.hide)
             .transition()
             .duration(1000)
+            .attr("cx", d => xScale(d.Time))
             .attr("cy", d => yScale(d.DepDelay))
             .attr("r", 3)
             .attr("class", "linenode")
@@ -477,11 +477,11 @@ class Stats {
             .data(data)
         nodes2.exit().remove();
         nodes2 = nodes2.enter().append("circle").merge(nodes2)
-            .attr("cx", d => xScale(d.Time))
             .on("mouseover", tip.show)
             .on("mouseout", tip.hide)
             .transition()
             .duration(1000)
+            .attr("cx", d => xScale(d.Time))
             .attr("cy", d => yScale(d.ArrDelay))
             .attr("r", 3)
             .attr("class", "linenode")
@@ -582,8 +582,6 @@ class Stats {
 
         for (let item of ["month", "day", "hour"]) {
             d3.select("#" + item + "3y").selectAll(".tick")
-                .attr("class", "dashedtick")
-            d3.select("#" + item + "3x").selectAll(".tick")
                 .attr("class", "dashedtick")
         }
     }
