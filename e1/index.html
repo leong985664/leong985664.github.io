@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Visualization for Flight On-time Performance of the United States</title>
+    <link rel="icon" href="img/icon.ico">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/styles.css"/>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.24.0/d3-legend.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+            integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+            integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+            crossorigin="anonymous"></script>
+    <script src="js/tip.js"></script>
+    <script src="js/geopoint.js"></script>
+    <script src="js/hierarchy.js"></script>
+    <script src="js/force.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/usmap.js"></script>
+    <script src="js/script.js"></script>
+</head>
+
+<body>
+<div class="div-container">
+    <h3>Visualization for Flight On-time Performance of the United States</h3>
+    <hr>
+    <div class="row">
+        <div id="mapdiv" class="col-xl-9">
+            <div class="row minuspadding">
+                <div class="col-lg-6">
+                    <button id="changemap" type="button" class="btn btn-info btn-sm" onclick="flip()">
+                        Change to NodesMap
+                    </button>
+                    <button id="clearmap" type="button" class="btn btn-light btn-sm" onclick="clearMap()">
+                        Clear Map
+                    </button>
+                    <label class="form-check-label incresepaddingleft">
+                        <input id="checkbox" class="form-check-input" type="checkbox" checked
+                               onchange="checkbox()">
+                        Show all airports
+                    </label>
+                </div>
+                <div class="col-lg-6">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-addon">Search</span>
+                        <input id="keyword" type="text" class="form-control" placeholder="IATA, ICAO or City Name"
+                               onkeyup="enterHit(event)">
+                        <span class="input-group-btn">
+                            <button class="btn btn-info" type="button" onclick="searchAirport()">Go!</button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div id="force" style="visibility: hidden; height: 0"></div>
+            <div id="nonforce">
+                <svg id="usmap"></svg>
+            </div>
+        </div>
+        <div id="paneldiv" class="col-xl-3 card panel panelbefore">
+            <div id="carddiv">
+                <div class="card-body reducedpadding">
+                    <h4 id="card_title" class="card-title"></h4>
+                    <h6 id="card_code" class="card-title"></h6>
+                </div>
+                <ul id="cardlist" class="list-group list-group-flush reducefontsize">
+                    <li class="list-group-item reducedpadding">
+                        <span class="font-weight-bold">Municipality: </span><span id="card_municipality"></span>
+                    </li>
+                    <li class="list-group-item reducedpadding">
+                        <span class="font-weight-bold">Coordinate: </span>
+                        <table class="inlinetable">
+                            <tr>
+                                <td id="card_longitude"></td>
+                            </tr>
+                            <tr>
+                                <td id="card_latitude"></td>
+                            </tr>
+                        </table>
+                    </li>
+                    <li class="list-group-item reducedpadding">
+                        <span class="font-weight-bold">Elevation: </span><span id="card_elevation"></span>
+                    </li>
+                </ul>
+            </div>
+            <div id="piediv" class="pie">
+                <svg id="piechart"></svg>
+            </div>
+        </div>
+    </div>
+    <div id="hrdiv"></div>
+    <div id="accordion" class="panelbefore" role="tablist">
+        <div class="card">
+            <div class="card-header collapsedtitle" role="tab" id="headingOne">
+                <h6 class="mb-0">
+                    <a data-toggle="collapse" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Monthly Statistical Data
+                    </a>
+                </h6>
+            </div>
+            <div id="collapseOne" class="collapse show reducedpadding" role="tabpanel" aria-labelledby="headingOne"
+                 data-parent="#accordion">
+                <div id="month" class="row"></div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header collapsedtitle" role="tab" id="headingTwo">
+                <h6 class="mb-0">
+                    <a class="collapsed" data-toggle="collapse" href="#collapseTwo" aria-expanded="false"
+                       aria-controls="collapseTwo">
+                        Daily Statistical Data
+                    </a>
+                </h6>
+            </div>
+            <div id="collapseTwo" class="collapse show reducedpadding" role="tabpanel" aria-labelledby="headingTwo"
+                 data-parent="#accordion">
+                <div id="day" class="row"></div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header collapsedtitle" role="tab" id="headingThree">
+                <h6 class="mb-0">
+                    <a class="collapsed" data-toggle="collapse" href="#collapseThree" aria-expanded="false"
+                       aria-controls="collapseThree">
+                        Hourly Statistical Data
+                    </a>
+                </h6>
+            </div>
+            <div id="collapseThree" class="collapse show reducedpadding" role="tabpanel" aria-labelledby="headingThree"
+                 data-parent="#accordion">
+                <div id="hour" class="row"></div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <h4>Airport Connections of the United States</h4>
+    <div class="row">
+        <div class="col-xl-1"></div>
+        <div id="hierarchy" class="col-xl-10 nopadding"></div>
+        <div class="col-xl-1"></div>
+    </div>
+    <div id="source" class="row">
+        <div class="col-xl-12 footer">
+            <hr>
+            <h7>NOTE</h7>
+            <p>This visualization is brought you by Run Li, Yulong Liang and Zhi Wang, who are currently students of the
+                School of Computing of the University of Utah. <strong>Library reference:</strong> [1].<a
+                        href="https://d3js.org/">d3.js</a> [2].<a href="http://getbootstrap.com/">Bootstrap</a> [3].<a
+                        href="http://labratrevenge.com/d3-tip/">D3-tip</a> [4].<a href="d3-legend.susielu.com/">d3-legend</a>
+                <strong>Code reference: </strong> [1].<a href="https://bl.ocks.org/mbostock/7607999">Hierarchical Edge
+                    Bundling</a>, Mike Bostock. [2].<a href="https://bl.ocks.org/mbostock/4062045">Force-Directed
+                    Graph</a>, Mike Bostock. © Copyright 2017 All Rights Reverved.</p>
+            <h7>SOURCE</h7>
+            <p>U.S. Department of Transportation, Bureau of Transportation Statistics. Airline On-Time Performance
+                Data[Jan-Dec 2016]. Accessed via http://www.transtats.bts.gov. OpenFlights. Global Airports Data.
+                Accessed via http://www.openflights.org. U.S. Census Bureau. U.S. Geographic Data. Access via
+                http://www.census.gov</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
