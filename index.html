@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Unemployment Rate Map of the State of Utah</title>
     <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="tip.js"></script>
     <!--<script src="bootstrap.min.js"></script>-->
     <!--<script src="bootstrap.bundle.min.js"></script>-->
     <link rel="stylesheet" href="bootstrap.min.css" type="text/css">
     <style>
         .tract {
             stroke: #FFF;
-            stroke-width: 0.3px;
         }
 
         .hovered {
@@ -20,6 +20,27 @@
         .selected {
             fill: MediumSeaGreen;
         }
+
+        .boarder {
+            fill: none;
+            stroke: #DDD;
+            stroke-width: 2px;
+        }
+
+        .chart-tip {
+            /*line-height: 1;*/
+            /*font-weight: bold;*/
+            font-size: 0.5rem;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border-radius: 2px;
+        }
+
+        .tooltipindex {
+            color: #d4d4d4;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -27,35 +48,57 @@
     <h1>Unemployment Rate Map of the State of Utah</h1>
     <hr>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-xl-6">
+            <div class="row">
+                <button type="button" class="col-xl-12 btn btn-danger btn-sm" onclick="clearmap()">Clear Map</button>
+            </div>
             <svg>
                 <g id="tract"></g>
             </svg>
         </div>
-        <div class="col-md-6">
-            <h6>17 Precalculated Maximum Population ASUs (Greedy Algorithm)</h6>
+        <div class="col-xl-6">
+            <h6>17 Precalculated Max Population ASUs (Greedy Algorithm)</h6>
             <div class="btn-group btn-group-sm mr-2" role="group" aria-label="First group">
-                <button type="button" class="btn btn-light" onclick="greedy(0)">1</button>
-                <button type="button" class="btn btn-light" onclick="greedy(1)">2</button>
-                <button type="button" class="btn btn-light" onclick="greedy(2)">3</button>
-                <button type="button" class="btn btn-light" onclick="greedy(3)">4</button>
-                <button type="button" class="btn btn-light" onclick="greedy(4)">5</button>
-                <button type="button" class="btn btn-light" onclick="greedy(5)">6</button>
-                <button type="button" class="btn btn-light" onclick="greedy(6)">7</button>
-                <button type="button" class="btn btn-light" onclick="greedy(7)">8</button>
-                <button type="button" class="btn btn-light" onclick="greedy(8)">9</button>
-                <button type="button" class="btn btn-light" onclick="greedy(9)">10</button>
-                <button type="button" class="btn btn-light" onclick="greedy(10)">11</button>
-                <button type="button" class="btn btn-light" onclick="greedy(11)">12</button>
-                <button type="button" class="btn btn-light" onclick="greedy(12)">13</button>
-                <button type="button" class="btn btn-light" onclick="greedy(13)">14</button>
-                <button type="button" class="btn btn-light" onclick="greedy(14)">15</button>
-                <button type="button" class="btn btn-light" onclick="greedy(15)">16</button>
-                <button type="button" class="btn btn-light" onclick="greedy(16)">17</button>
-                <button type="button" class="btn btn-light" onclick="greedy(-1)">All</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-1)">1</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-2)">2</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-3)">3</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-4)">4</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-5)">5</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-6)">6</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-7)">7</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-8)">8</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-9)">9</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-10)">10</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-11)">11</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-12)">12</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-13)">13</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-14)">14</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-15)">15</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-16)">16</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-17)">17</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-100)">All</button>
             </div>
-            <div>
-                <button type="button" class="btn btn-info btn-sm" onclick="clearmap()">Clear Map</button>
+            <hr>
+            <h6>17 Precalculated Max Population ASUs (Refined Greedy Algorithm)</h6>
+            <div class="btn-group btn-group-sm mr-2" role="group" aria-label="First group">
+                <button type="button" class="btn btn-light" onclick="greedy(1)">1</button>
+                <button type="button" class="btn btn-light" onclick="greedy(2)">2</button>
+                <button type="button" class="btn btn-light" onclick="greedy(3)">3</button>
+                <button type="button" class="btn btn-light" onclick="greedy(4)">4</button>
+                <button type="button" class="btn btn-light" onclick="greedy(5)">5</button>
+                <button type="button" class="btn btn-light" onclick="greedy(6)">6</button>
+                <button type="button" class="btn btn-light" onclick="greedy(7)">7</button>
+                <button type="button" class="btn btn-light" onclick="greedy(8)">8</button>
+                <button type="button" class="btn btn-light" onclick="greedy(9)">9</button>
+                <button type="button" class="btn btn-light" onclick="greedy(10)">10</button>
+                <button type="button" class="btn btn-light" onclick="greedy(11)">11</button>
+                <button type="button" class="btn btn-light" onclick="greedy(12)">12</button>
+                <button type="button" class="btn btn-light" onclick="greedy(13)">13</button>
+                <button type="button" class="btn btn-light" onclick="greedy(14)">14</button>
+                <button type="button" class="btn btn-light" onclick="greedy(15)">15</button>
+                <button type="button" class="btn btn-light" onclick="greedy(16)">16</button>
+                <button type="button" class="btn btn-light" onclick="greedy(17)">17</button>
+                <button type="button" class="btn btn-light" onclick="greedy(100)">All</button>
             </div>
             <hr>
             <div class="card text-center">
@@ -87,7 +130,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12 table-responsive">
+        <div class="col-xl-12 table-responsive">
             <table class="table table-hover">
                 <thead>
                 <tr>
@@ -104,7 +147,6 @@
         </div>
     </div>
 </div>
-
 <script src="script.js"></script>
 </body>
 </html>
