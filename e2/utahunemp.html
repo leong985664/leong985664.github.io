@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unemployment Rate Map of the State of Utah</title>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="tip.js"></script>
+    <!--<script src="bootstrap.min.js"></script>-->
+    <!--<script src="bootstrap.bundle.min.js"></script>-->
+    <link rel="stylesheet" href="bootstrap.min.css" type="text/css">
+    <style>
+        .tract {
+            stroke: #FFF;
+        }
+
+        .hovered {
+            fill: #DDD;
+        }
+
+        .selected {
+            fill: MediumSeaGreen;
+        }
+
+        .boarder {
+            fill: none;
+            stroke: #DDD;
+            stroke-width: 2px;
+        }
+
+        .chart-tip {
+            /*line-height: 1;*/
+            /*font-weight: bold;*/
+            font-size: 0.5rem;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border-radius: 2px;
+        }
+
+        .tooltipindex {
+            color: #d4d4d4;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Unemployment Rate Map of the State of Utah</h1>
+    <hr>
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="row">
+                <button type="button" class="col-xl-12 btn btn-danger btn-sm" onclick="clearmap()">Clear Map</button>
+            </div>
+            <svg>
+                <g id="tract"></g>
+            </svg>
+        </div>
+        <div class="col-xl-6">
+            <h6>17 Precalculated Max Population ASUs (Greedy Algorithm)</h6>
+            <div class="btn-group btn-group-sm mr-2" role="group" aria-label="First group">
+                <button type="button" class="btn btn-light" onclick="greedy(-1)">1</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-2)">2</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-3)">3</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-4)">4</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-5)">5</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-6)">6</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-7)">7</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-8)">8</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-9)">9</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-10)">10</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-11)">11</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-12)">12</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-13)">13</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-14)">14</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-15)">15</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-16)">16</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-17)">17</button>
+                <button type="button" class="btn btn-light" onclick="greedy(-100)">All</button>
+            </div>
+            <hr>
+            <h6>17 Precalculated Max Population ASUs (Refined Greedy Algorithm)</h6>
+            <div class="btn-group btn-group-sm mr-2" role="group" aria-label="First group">
+                <button type="button" class="btn btn-light" onclick="greedy(1)">1</button>
+                <button type="button" class="btn btn-light" onclick="greedy(2)">2</button>
+                <button type="button" class="btn btn-light" onclick="greedy(3)">3</button>
+                <button type="button" class="btn btn-light" onclick="greedy(4)">4</button>
+                <button type="button" class="btn btn-light" onclick="greedy(5)">5</button>
+                <button type="button" class="btn btn-light" onclick="greedy(6)">6</button>
+                <button type="button" class="btn btn-light" onclick="greedy(7)">7</button>
+                <button type="button" class="btn btn-light" onclick="greedy(8)">8</button>
+                <button type="button" class="btn btn-light" onclick="greedy(9)">9</button>
+                <button type="button" class="btn btn-light" onclick="greedy(10)">10</button>
+                <button type="button" class="btn btn-light" onclick="greedy(11)">11</button>
+                <button type="button" class="btn btn-light" onclick="greedy(12)">12</button>
+                <button type="button" class="btn btn-light" onclick="greedy(13)">13</button>
+                <button type="button" class="btn btn-light" onclick="greedy(14)">14</button>
+                <button type="button" class="btn btn-light" onclick="greedy(15)">15</button>
+                <button type="button" class="btn btn-light" onclick="greedy(16)">16</button>
+                <button type="button" class="btn btn-light" onclick="greedy(17)">17</button>
+                <button type="button" class="btn btn-light" onclick="greedy(100)">All</button>
+            </div>
+            <hr>
+            <div class="card text-center">
+                <div class="card-header">
+                    Aggregate Unemployment Rate
+                </div>
+                <div class="card-body">
+                    <h1 class="card-text text-info" id="rate">0%</h1>
+                </div>
+            </div>
+            <hr>
+            <div class="card text-center">
+                <div class="card-header">
+                    Aggregate Population
+                </div>
+                <div class="card-body">
+                    <h1 class="card-text text-info" id="pop">0</h1>
+                </div>
+            </div>
+            <hr>
+            <div class="card text-center">
+                <div class="card-header">
+                    Number of Tracts
+                </div>
+                <div class="card-body">
+                    <h1 class="card-text text-info" id="number">0</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-12 table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Track</th>
+                    <th>Population</th>
+                    <th>Employed</th>
+                    <th>Unemployed</th>
+                    <th>Rate</th>
+                </tr>
+                </thead>
+                <tbody id="tablebody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
