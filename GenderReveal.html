@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gender Reveal Puzzle Arena</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #111827;
+      --card: #020617;
+      --accent: #f97316;
+      --accent-soft: rgba(249, 115, 22, 0.16);
+      --accent-strong: rgba(249, 115, 22, 0.28);
+      --text: #e5e7eb;
+      --text-soft: #9ca3af;
+      --border: #1f2937;
+      --error: #f97373;
+      --success: #4ade80;
+      --hint: #eab308;
+      --radius-xl: 18px;
+      --radius-lg: 12px;
+      --shadow-soft: 0 22px 45px rgba(15, 23, 42, 0.85);
+      --shadow-chip: 0 10px 25px rgba(15, 23, 42, 0.85);
+      --transition-fast: 0.15s ease-out;
+      --transition: 0.22s ease-out;
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      font-family: var(--font-main);
+      background:
+        radial-gradient(circle at top left, #1f2937 0, #020617 55%),
+        radial-gradient(circle at 120% 0, #111827 0, #020617 55%),
+        #020617;
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1080px;
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.94));
+      border-radius: 32px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: var(--shadow-soft);
+      padding: 26px 24px 28px;
+      position: relative;
+      overflow: hidden;
+
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-height: 100%;
+    }
+
+    @media (min-width: 768px) {
+      .app-shell {
+        padding: 28px 30px 30px;
+      }
+    }
+
+    .app-shell::before,
+    .app-shell::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(42px);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .app-shell::before {
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, var(--accent-strong), transparent);
+      top: -120px;
+      right: -80px;
+    }
+
+    .app-shell::after {
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(52, 211, 153, 0.35), transparent);
+      bottom: -100px;
+      left: -60px;
+    }
+
+    header {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-shrink: 0;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .chip {
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      color: var(--text-soft);
+      background: rgba(15, 23, 42, 0.85);
+      box-shadow: var(--shadow-chip);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chip span.spark {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(249, 115, 22, 0.85);
+    }
+
+    .title-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    h1 {
+      font-size: clamp(22px, 3vw, 26px);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-badge {
+      font-size: 10px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(248, 250, 252, 0.18);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.8));
+      color: var(--accent);
+      letter-spacing: 0.12em;
+    }
+
+    /* 顶部两块：左说明，右控制条 */
+
+    .top-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .intro-card {
+      flex: 1 1 280px;
+      min-width: 0;
+      border-radius: 20px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.9));
+      padding: 10px 12px 10px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.85);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .intro-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-soft);
+      margin-bottom: 2px;
+    }
+
+    .intro-text {
+      font-size: 12px;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
+    .intro-text strong {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .intro-phrase {
+      margin-top: 10px;
+    }
+
+    .control-panel {
+      flex: 1 1 260px;
+      min-width: 0;
+      position: relative;
+      z-index: 1;
+      border-radius: 20px;
+      border: 1px solid rgba(30, 64, 175, 0.6);
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.9));
+      padding: 10px 12px 10px;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.9);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .control-main-row {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .control-main {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .timer-block,
+    .stats-block {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      width: 100%;
+    }
+
+    .control-label {
+      font-size: 10px;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .timer-display-main {
+      font-variant-numeric: tabular-nums;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+    }
+
+    .control-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+
+    .control-rules {
+      font-size: 10px;
+      color: rgba(148, 163, 184, 0.9);
+      line-height: 1.4;
+    }
+
+    @media (max-width: 768px) {
+      .control-main-row {
+        align-items: flex-start;
+      }
+      .timer-display-main {
+        font-size: 16px;
+      }
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, #f97316, #fb923c);
+      color: #0b1120;
+      box-shadow: 0 10px 26px rgba(248, 153, 72, 0.35);
+    }
+
+    button.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 32px rgba(248, 153, 72, 0.5);
+    }
+
+    button.primary:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 16px rgba(248, 153, 72, 0.45);
+    }
+
+    button.outline {
+      background: rgba(15, 23, 42, 0.96);
+      color: var(--text-soft);
+      border: 1px solid rgba(75, 85, 99, 0.85);
+      padding-inline: 10px;
+    }
+
+    button.outline:hover {
+      background: rgba(15, 23, 42, 1);
+      color: #e5e7eb;
+      border-color: rgba(148, 163, 184, 0.95);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.9);
+    }
+
+    button.small {
+      padding: 4px 9px;
+      font-size: 11px;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* 当前句子进度（嵌在 intro-card 里） */
+
+    .phrase-bar {
+      border-radius: 18px;
+      border: 1px solid rgba(30, 64, 175, 0.5);
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.9));
+      padding: 8px 10px;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.7);
+    }
+
+    .phrase-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-soft);
+      margin-bottom: 4px;
+    }
+
+    .phrase-text {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      word-spacing: 0.25em;
+      text-transform: uppercase;
+      white-space: normal;
+      word-wrap: break-word;
+    }
+
+    .phrase-text span.word {
+      margin-right: 4px;
+    }
+
+    .phrase-text span.word.completed {
+      color: #fbbf24;
+    }
+
+    /* 顶部分割线（固定，不随谜题滚动） */
+
+    .top-divider {
+      border-top: 1px solid rgba(148, 163, 184, 0.4);
+      margin: 8px 0 10px;
+      opacity: 0.9;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 下半部分：只滚动谜题列表 */
+
+    .puzzle-section {
+      position: relative;
+      z-index: 1;
+      margin-top: 0;
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .puzzle-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-bottom: 8px;
+    }
+
+    .puzzle-card {
+      background: radial-gradient(circle at top left, var(--bg-soft), var(--card));
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(30, 64, 175, 0.4);
+      padding: 14px 14px 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .puzzle-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 0 -40%, rgba(248, 250, 252, 0.04), transparent 60%);
+      opacity: 1;
+      pointer-events: none;
+    }
+
+    .puzzle-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .puzzle-title {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .puzzle-label {
+      font-size: 11px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .puzzle-name {
+      font-size: 13px;
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .puzzle-meta {
+      font-size: 11px;
+      color: var(--text-soft);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 3px 8px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .pill.solved {
+      border-color: rgba(34, 197, 94, 0.85);
+      color: var(--success);
+    }
+
+    .pill.pending {
+      border-color: rgba(148, 163, 184, 0.8);
+      color: var(--text-soft);
+    }
+
+    .word-length {
+      opacity: 0.9;
+    }
+
+    .puzzle-body {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .puzzle-hint-text {
+      font-size: 11px;
+      color: var(--text-soft);
+      line-height: 1.45;
+      margin-bottom: 2px;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 6px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      padding: 8px 10px;
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+    }
+
+    input[type="text"]::placeholder {
+      color: rgba(148, 163, 184, 0.7);
+    }
+
+    input[type="text"]:focus {
+      border-color: rgba(249, 115, 22, 0.9);
+      box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.7);
+      background: rgba(12, 18, 32, 0.98);
+      transform: translateY(-0.5px);
+    }
+
+    .feedback {
+      min-height: 18px;
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .feedback.error {
+      color: var(--error);
+    }
+
+    .feedback.success {
+      color: var(--success);
+    }
+
+    .feedback.info {
+      color: var(--text-soft);
+    }
+
+    .controls-row {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;  /* hint 按钮左对齐 */
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .hint-buttons-box {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: flex-start; /* 明确左对齐 */
+    }
+
+    .hint-lines-block {
+      margin-top: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .hint-line {
+      font-size: 11px;
+      color: var(--hint);
+      display: none;
+    }
+
+    .hint-line.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="chip-row">
+        <div class="chip">
+          <span class="spark"></span>
+          GENDER REVEAL · PUZZLE ARENA
+        </div>
+        <div class="chip">
+          7 PUZZLES · 2 TEAMS · 1 SECRET
+        </div>
+      </div>
+
+      <div class="title-row">
+        <h1>
+          Puzzle Lab for the Reveal
+          <span class="title-badge">双队计时解谜</span>
+        </h1>
+      </div>
+    </header>
+
+    <!-- 顶部两块：左介绍框 + 右控制条 -->
+    <div class="top-row">
+      <section class="intro-card">
+        <div class="intro-title">游戏说明</div>
+        <div class="intro-text">
+          宾客平均分成两队，解谜7道题目，用时更短者获胜。
+          每题得到一个<strong>英文单词</strong>。
+          提示次数不限，但每使用1次提示，总时间会自动增加<strong>5分钟</strong>。
+          全部单词答对后，就能拼出那句用来唤醒惊喜的话语。
+        </div>
+        <div class="intro-title">How to Play</div>
+        <div class="intro-text">
+          Guests are divided into two teams to solve 7 puzzles, with the faster team winning.
+          Each puzzle yields one <strong>English word</strong>.
+          Hints are unlimited, but each hint used automatically adds <strong>5 minutes</strong> to the total time.
+          When all words are correct, they form the sentence that unlocks the surprise.
+        </div>
+
+        <!-- 当前句子进度嵌在说明卡片里 -->
+        <div class="intro-phrase">
+          <div class="phrase-bar">
+            <div class="phrase-label">当前进度 · Current Progress</div>
+            <div class="phrase-text" id="phrase-bar"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="control-panel">
+        <div class="control-main-row">
+          <div class="control-main">
+            <div class="timer-block">
+              <div class="control-label">解题用时 · Puzzle Time</div>
+              <div class="timer-display-main" id="timer-display">00:00</div>
+            </div>
+            <div class="timer-block">
+              <div class="control-label">总时间（含提示加时） · Total Time (with Hint Cost)</div>
+              <div class="timer-display-main" id="total-time-display">00:00</div>
+            </div>
+            <div class="stats-block">
+              <div class="control-label">已用提示 · Hints Used</div>
+              <div class="timer-display-main" id="hints-used-display">0</div>
+            </div>
+          </div>
+
+          <div class="control-actions">
+            <button class="primary" id="start-timer-btn">
+              ▶ Start
+            </button>
+            <button class="outline" id="reset-timer-btn">
+              ⟳ Reset Game
+            </button>
+          </div>
+        </div>
+
+        <div class="control-rules">
+        </div>
+      </section>
+    </div>
+
+    <!-- 固定分割线（不随谜题滚动） -->
+    <div class="top-divider"></div>
+
+    <!-- 谜题列表（滚动） -->
+    <section class="puzzle-section">
+      <div class="puzzle-list" id="puzzle-list"></div>
+    </section>
+  </div>
+
+  <script>
+    // =============================
+    // 配置区：七个谜题
+    // =============================
+
+    const puzzles = [
+      {
+        id: "p1",
+        title: "Where Stories Joined",
+        expectedAnswer: "UNION",
+        hints: [
+          "Try looking at the characters upside down, what can you see?",
+          "Once you find the correct numbers + letters, look it up on your favorite map app. What is the name of the lake?"
+        ]
+      },
+      {
+        id: "p2",
+        title: "Paths for a Little Miracle",
+        expectedAnswer: "OF",
+        hints: [
+          "Identify each place from the photos and locate them on the map.",
+          "Connect the places as described. The shape of the path is the letter you need."
+        ]
+      },
+      {
+        id: "p3",
+        title: "古声初启",
+        expectedAnswer: "LOVE",
+        hints: [
+          "在八首诗词中，找到最符合描述的一首——《关雎》。",
+          "找到最符合要求的诗词后，将其中所有的红色偏旁部首组合起来，得到一个字（繁体）。将得到的字翻译成英文。"
+        ]
+      },
+      {
+        id: "p4",
+        title: "The Script of New Life",
+        expectedAnswer: "BLOOMS",
+        hints: [
+          "Follow the direction of the strand and **read the colors from 3' to 5'**.\n\nUse the color map to identify each of the four DNA bases:\n\n- **Red → A**\n- **Blue → C**\n- **Green → G**\n- **Yellow → T**\n\nThese colors represent the **complementary DNA sequence**.\n\nApply base pairing (**A↔T, C↔G**) to convert each base into its actual partner.\n\nFor example, **AGTC → TCAG**.",
+          "Group the DNA bases into **triplets** (three letters per group).\n\nFor each triplet (X, Y, Z), compute its value using: 16×X + 4×Y + Z + 1, where X, Y, and Z are the value of the 1st, 2nd, and 3rd DNA base in the group.\n\nThe DNA bases have the following values:\n\n- **A = 0**\n- **C = 1**\n- **G = 2**\n- **T = 3**\n\nUse the resulting number (1–26) as the position of the letter in the alphabet to find the corresponding letter.\n\nFor example:\n\n- Triplet **(A, C, G)** → **16×0 + 4×1 + 2 + 1 = 7**\n- **7 → G** (7th letter of the alphabet)"
+        ]
+      },
+      {
+        id: "p5",
+        title: "A Moment in Time",
+        expectedAnswer: "NOW",
+        hints: [
+          "Convert the time on each clock to Atlanta’s time zone (EST). They point to the same time.",
+          "Find the correct time and write it in digital format (omit leading 0s). Turn 90 degrees clockwise and see what letter you can see for each number."
+        ]
+      },
+      {
+        id: "p6",
+        title: "Puzzle 365",
+        expectedAnswer: "IN",
+        hints: [
+          "In the first puzzle, look at a QWERTY keyboard. Each tennis ball represent a letter.",
+          "In the first puzzle, use the position of each pink ball to read the letters. Form a word with the letters.",
+          "In the second puzzle, each ball represent a different number according to the game rules. Snooker balls has the following numbers: red - 1, yellow - 2, green - 3, brown - 4, blue - 5, pink - 6, black - 7. Pool balls has the following numbers: 8-ball - 8, 9-ball - 9.",
+          "In the second puzzle, use the number of the ball to get the position of the letter in the word. Put the letters into those numbered spots to find the word.",
+          "In the final puzzle, take only the shaded letters from the first two answers to extract two short words.",
+          "In the final puzzle, recall your favorite office softwares from Microsoft and get the third word. Extract the shaded letters to reveal the final answer."
+        ]
+      },
+      {
+        id: "p7",
+        title: "Across Our Moments",
+        expectedAnswer: "HARMONY",
+        hints: [
+          "Each photo contains a hidden letter. Identify all seven of them.",
+          "Find all seven letters and read them in chronological order — they spell the answer."
+        ]
+      }
+    ];
+
+    const MIN_INTERVAL_MS = 30 * 1000;
+    const HINT_PENALTY_MS = 5 * 60 * 1000;
+    const STORAGE_KEY = "genderRevealPuzzleState_v3";
+
+    const puzzleState = {};
+    puzzles.forEach(p => {
+      puzzleState[p.id] = {
+        lastAttemptAt: 0,
+        solved: false,
+        attempts: 0,
+        hintsUsed: 0,
+        usedHints: []   // 支持任意数量 hint
+      };
+    });
+
+    let timerIntervalId = null;
+    let timerStartTimestamp = null;
+    let elapsedBeforePause = 0;
+
+    // =============================
+    // 状态存储
+    // =============================
+
+    function saveStateToStorage() {
+      const data = {
+        version: 3,
+        timerStartTimestamp,
+        elapsedBeforePause,
+        puzzleState
+      };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {
+        console.warn("Failed to save state:", e);
+      }
+    }
+
+    function loadStateFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (!data || data.version !== 3) return;
+
+        if (typeof data.timerStartTimestamp === "number") {
+          timerStartTimestamp = data.timerStartTimestamp;
+        }
+        if (typeof data.elapsedBeforePause === "number") {
+          elapsedBeforePause = data.elapsedBeforePause;
+        }
+        if (data.puzzleState) {
+          for (const id of Object.keys(data.puzzleState)) {
+            if (puzzleState[id]) {
+              const s = data.puzzleState[id];
+              puzzleState[id].lastAttemptAt = s.lastAttemptAt || 0;
+              puzzleState[id].solved = !!s.solved;
+              puzzleState[id].attempts = s.attempts || 0;
+              puzzleState[id].hintsUsed = s.hintsUsed || 0;
+              puzzleState[id].usedHints = Array.isArray(s.usedHints)
+                ? s.usedHints.map(Boolean)
+                : [];
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to load state:", e);
+      }
+    }
+
+    // =============================
+    // 句子进度条
+    // =============================
+
+    function renderPhraseBar() {
+      const bar = document.getElementById("phrase-bar");
+      if (!bar) return;
+      bar.innerHTML = "";
+
+      const frag = document.createDocumentFragment();
+      puzzles.forEach(p => {
+        const state = puzzleState[p.id];
+        const span = document.createElement("span");
+        span.className = "word";
+        const len = p.expectedAnswer.replace(/\s+/g, "").length;
+        if (state.solved) {
+          span.textContent = p.expectedAnswer.toUpperCase();
+          span.classList.add("completed");
+        } else {
+          span.textContent = "_".repeat(len);
+        }
+        frag.appendChild(span);
+        frag.appendChild(document.createTextNode(" "));
+      });
+
+      bar.appendChild(frag);
+    }
+
+    // =============================
+    // 谜题卡片
+    // =============================
+
+    function createPuzzleCard(puzzle, index) {
+      const state = puzzleState[puzzle.id];
+      const card = document.createElement("article");
+      card.className = "puzzle-card";
+
+      const header = document.createElement("div");
+      header.className = "puzzle-header";
+
+      const titleBox = document.createElement("div");
+      titleBox.className = "puzzle-title";
+
+      const label = document.createElement("div");
+      label.className = "puzzle-label";
+      label.textContent = `PUZZLE ${index + 1}`;
+
+      const name = document.createElement("div");
+      name.className = "puzzle-name";
+      name.textContent = puzzle.title;
+
+      titleBox.appendChild(label);
+      titleBox.appendChild(name);
+
+      const meta = document.createElement("div");
+      meta.className = "puzzle-meta";
+
+      const statusPill = document.createElement("div");
+      statusPill.dataset.statusPillFor = puzzle.id;
+      if (state.solved) {
+        statusPill.className = "pill solved";
+        statusPill.textContent = "Solved";
+      } else {
+        statusPill.className = "pill pending";
+        statusPill.textContent = "Pending";
+      }
+
+      const attemptsSpan = document.createElement("span");
+      attemptsSpan.dataset.attemptsFor = puzzle.id;
+      attemptsSpan.textContent = `Attempts: ${state.attempts || 0}`;
+
+      const hintsSpan = document.createElement("span");
+      hintsSpan.dataset.hintsFor = puzzle.id;
+      hintsSpan.textContent = `Hints: ${state.hintsUsed || 0}`;
+
+      meta.appendChild(statusPill);
+      meta.appendChild(attemptsSpan);
+      meta.appendChild(hintsSpan);
+
+      header.appendChild(titleBox);
+      header.appendChild(meta);
+
+      const body = document.createElement("div");
+      body.className = "puzzle-body";
+
+      const inputRow = document.createElement("div");
+      inputRow.className = "input-row";
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "在此输入答案 · Type your answer here";
+      input.autocomplete = "off";
+      input.dataset.inputFor = puzzle.id;
+
+      const checkBtn = document.createElement("button");
+      checkBtn.className = "primary";
+      checkBtn.textContent = "Check";
+      checkBtn.dataset.checkFor = puzzle.id;
+
+      inputRow.appendChild(input);
+      inputRow.appendChild(checkBtn);
+      body.appendChild(inputRow);
+
+      const controlsRow = document.createElement("div");
+      controlsRow.className = "controls-row";
+
+      const hintButtonsBox = document.createElement("div");
+      hintButtonsBox.className = "hint-buttons-box";
+
+      const feedback = document.createElement("div");
+      feedback.className = "feedback";
+      feedback.dataset.feedbackFor = puzzle.id;
+      feedback.textContent = ""; // 不显示默认句子
+
+      // 为每个 hint 生成一个按钮
+      for (let i = 0; i < puzzle.hints.length; i++) {
+        const hb = document.createElement("button");
+        hb.className = "outline small";
+
+        if (puzzle.id === "p6") {
+          const group = Math.floor(i / 2) + 1;  // 1,2,3
+          const sub = (i % 2) + 1;              // 1,2
+          hb.textContent = `Hint ${group}.${sub}`;
+        } else {
+          hb.textContent = `Hint ${i + 1}`;
+        }
+
+        hb.dataset.hintFor = puzzle.id;
+        hb.dataset.hintIndex = String(i);
+
+        const alreadyUsed = !!state.usedHints[i];
+        if (alreadyUsed) hb.disabled = true;
+
+        hb.addEventListener("click", () => handleHintClick(puzzle.id, i));
+        hintButtonsBox.appendChild(hb);
+      }
+
+      controlsRow.appendChild(hintButtonsBox);
+      controlsRow.appendChild(feedback);
+
+      const hintLinesBlock = document.createElement("div");
+      hintLinesBlock.className = "hint-lines-block";
+
+      for (let i = 0; i < puzzle.hints.length; i++) {
+        const hintLine = document.createElement("div");
+        hintLine.className = "hint-line";
+        hintLine.dataset.hintTextFor = `${puzzle.id}-${i}`;
+        if (state.usedHints[i]) {
+          hintLine.textContent = puzzle.hints[i] || "";
+          hintLine.classList.add("visible");
+        }
+        hintLinesBlock.appendChild(hintLine);
+      }
+
+      body.appendChild(controlsRow);
+      body.appendChild(hintLinesBlock);
+
+      card.appendChild(header);
+      card.appendChild(body);
+
+      if (state.solved) {
+        input.disabled = true;
+        checkBtn.disabled = true;
+        feedback.textContent = "这一题已经解出来啦 · Already solved.";
+        feedback.className = "feedback success";
+      }
+
+      checkBtn.addEventListener("click", () => handleCheckAnswer(puzzle.id));
+      input.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleCheckAnswer(puzzle.id);
+        }
+      });
+
+      return card;
+    }
+
+    function renderPuzzleList() {
+      const container = document.getElementById("puzzle-list");
+      container.innerHTML = "";
+      puzzles.forEach((p, idx) =>
+        container.appendChild(createPuzzleCard(p, idx))
+      );
+    }
+
+    // =============================
+    // 答案校验 + 冷却
+    // =============================
+
+    function normalizeAnswer(str) {
+      return str.trim().replace(/\s+/g, " ").toUpperCase();
+    }
+
+    function handleCheckAnswer(puzzleId) {
+      const puzzle = puzzles.find(p => p.id === puzzleId);
+      if (!puzzle) return;
+      const state = puzzleState[puzzleId];
+      const now = Date.now();
+
+      const input = document.querySelector(`input[data-input-for="${puzzleId}"]`);
+      const feedback = document.querySelector(
+        `.feedback[data-feedback-for="${puzzleId}"]`
+      );
+      const statusPill = document.querySelector(
+        `.pill[data-status-pill-for="${puzzleId}"]`
+      );
+      const attemptsSpan = document.querySelector(
+        `[data-attempts-for="${puzzleId}"]`
+      );
+
+      if (!input || !feedback || !statusPill || !attemptsSpan) return;
+
+      const raw = input.value;
+      if (!raw.trim()) {
+        feedback.textContent = "请先输入答案 · Please enter an answer first.";
+        feedback.className = "feedback error";
+        return;
+      }
+
+      if (state.solved) {
+        feedback.textContent = "这一题已经解出来啦 · Already solved.";
+        feedback.className = "feedback success";
+        return;
+      }
+
+      const timeSinceLast = now - state.lastAttemptAt;
+      if (state.lastAttemptAt !== 0 && timeSinceLast < MIN_INTERVAL_MS) {
+        const waitMs = MIN_INTERVAL_MS - timeSinceLast;
+        const waitSec = Math.ceil(waitMs / 1000);
+        feedback.textContent =
+          `请再等 ${waitSec} 秒后再尝试 · Please wait ${waitSec} more second(s) before trying again.`;
+        feedback.className = "feedback error";
+        return;
+      }
+
+      const normalizedInput = normalizeAnswer(raw);
+      const expected = normalizeAnswer(puzzle.expectedAnswer);
+
+      state.lastAttemptAt = now;
+      state.attempts += 1;
+      attemptsSpan.textContent = `Attempts: ${state.attempts}`;
+      saveStateToStorage();
+
+      if (normalizedInput === expected) {
+        state.solved = true;
+        feedback.textContent =
+          "正确！该答案已锁定 · Correct! This answer is locked in.";
+        feedback.className = "feedback success";
+
+        statusPill.textContent = "Solved";
+        statusPill.classList.remove("pending");
+        statusPill.classList.add("solved");
+
+        input.disabled = true;
+        const checkBtn = document.querySelector(
+          `button[data-check-for="${puzzleId}"]`
+        );
+        if (checkBtn) checkBtn.disabled = true;
+
+        saveStateToStorage();
+        renderPhraseBar();
+      } else {
+        feedback.textContent =
+          "暂时不对，冷却结束后再试一次 · That doesn’t quite match. Try again after the cooldown.";
+        feedback.className = "feedback error";
+      }
+    }
+
+    // =============================
+    // 提示逻辑
+    // =============================
+
+    function handleHintClick(puzzleId, hintIndex) {
+      const puzzle = puzzles.find(p => p.id === puzzleId);
+      if (!puzzle) return;
+      const state = puzzleState[puzzleId];
+
+      const feedback = document.querySelector(
+        `.feedback[data-feedback-for="${puzzleId}"]`
+      );
+      const hintsSpan = document.querySelector(
+        `[data-hints-for="${puzzleId}"]`
+      );
+      const hintLine = document.querySelector(
+        `.hint-line[data-hint-text-for="${puzzleId}-${hintIndex}"]`
+      );
+      const hintBtn = document.querySelector(
+        `button[data-hint-for="${puzzleId}"][data-hint-index="${hintIndex}"]`
+      );
+
+      if (!feedback || !hintsSpan || !hintLine || !hintBtn) return;
+
+      if (state.usedHints[hintIndex]) {
+        hintLine.classList.add("visible");
+        feedback.textContent =
+          "这一条提示已经用过了 · This hint has already been used for this puzzle.";
+        feedback.className = "feedback info";
+        return;
+      }
+
+      // 不限制总次数，同一个 hint 只算一次
+      state.usedHints[hintIndex] = true;
+      state.hintsUsed += 1;
+
+      const text = puzzle.hints[hintIndex] || "Hint not configured.";
+      hintLine.textContent = text;
+      hintLine.classList.add("visible");
+
+      hintBtn.disabled = true;
+      hintsSpan.textContent = `Hints: ${state.hintsUsed}`;
+
+      feedback.textContent =
+        "已使用提示，总时间已增加 5 分钟 · Hint used. +5 minutes added to total time.";
+      feedback.className = "feedback info";
+
+      saveStateToStorage();
+      updateTimerDisplay();
+    }
+
+    function getTotalHintsUsed() {
+      return Object.values(puzzleState).reduce(
+        (sum, s) => sum + (s.hintsUsed || 0),
+        0
+      );
+    }
+
+    // =============================
+    // 计时器
+    // =============================
+
+    function formatTime(ms) {
+      if (ms < 0) ms = 0;
+      const totalSeconds = Math.floor(ms / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+        2,
+        "0"
+      )}`;
+    }
+
+    function computeBaseElapsedMs() {
+      let elapsed = elapsedBeforePause;
+      if (timerStartTimestamp !== null) {
+        elapsed = Date.now() - timerStartTimestamp + elapsedBeforePause;
+      }
+      return elapsed;
+    }
+
+    function updateTimerDisplay() {
+      const display = document.getElementById("timer-display");
+      const totalDisplay = document.getElementById("total-time-display");
+      const hintsDisplay = document.getElementById("hints-used-display");
+      if (!display || !totalDisplay || !hintsDisplay) return;
+
+      const baseElapsed = computeBaseElapsedMs();
+      const totalHints = getTotalHintsUsed();
+      const penaltyMs = totalHints * HINT_PENALTY_MS;
+      const totalMs = baseElapsed + penaltyMs;
+
+      display.textContent = formatTime(baseElapsed);
+      totalDisplay.textContent = formatTime(totalMs);
+      hintsDisplay.textContent = totalHints;
+    }
+
+    function startTimer() {
+      if (timerIntervalId !== null) return;
+      if (timerStartTimestamp === null) {
+        timerStartTimestamp = Date.now();
+        saveStateToStorage();
+      }
+      timerIntervalId = setInterval(updateTimerDisplay, 250);
+      updateTimerDisplay();
+    }
+
+    function resetGame() {
+      if (timerIntervalId !== null) {
+        clearInterval(timerIntervalId);
+        timerIntervalId = null;
+      }
+      timerStartTimestamp = null;
+      elapsedBeforePause = 0;
+
+      puzzles.forEach(p => {
+        puzzleState[p.id] = {
+          lastAttemptAt: 0,
+          solved: false,
+          attempts: 0,
+          hintsUsed: 0,
+          usedHints: []
+        };
+      });
+
+      saveStateToStorage();
+      renderPuzzleList();
+      renderPhraseBar();
+      updateTimerDisplay();
+    }
+
+    // =============================
+    // 初始化
+    // =============================
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadStateFromStorage();
+      renderPuzzleList();
+      renderPhraseBar();
+      updateTimerDisplay();
+
+      if (timerStartTimestamp !== null) {
+        timerIntervalId = setInterval(updateTimerDisplay, 250);
+      }
+
+      const startBtn = document.getElementById("start-timer-btn");
+      const resetBtn = document.getElementById("reset-timer-btn");
+
+      if (startBtn) {
+        startBtn.addEventListener("click", () => {
+          startTimer();
+        });
+      }
+
+      if (resetBtn) {
+        resetBtn.addEventListener("click", () => {
+          if (
+            confirm(
+              "是否重置全部谜题与计时，供下一队使用？\n\nAre you sure you want to reset all puzzles and the timer for the next team?"
+            )
+          ) {
+            resetGame();
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
