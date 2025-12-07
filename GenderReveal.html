@@ -706,87 +706,75 @@
 
   <script>
     // =============================
-    // 加密/解密工具函数
-    // =============================
-    
-    function hideAnswer(str) {
-      return btoa(str.split('').reverse().join(''));
-    }
-
-    function revealAnswer(encoded) {
-      return atob(encoded).split('').reverse().join('');
-    }
-
-    // =============================
-    // 配置区：七个谜题（已加密）
+    // 配置区：七个谜题
     // =============================
 
     const puzzles = [
       {
         id: "p1",
         title: "Where Stories Joined",
-        expectedAnswer: "Tk9JTlU=",
+        expectedAnswer: "UNION",
         hints: [
-          "P2VlcyB1b3kgbmFjIHRhaHcsIG53b2QgZWRpc3B1IHNyZXRjYXJhaGMgZWh0IHRhIGduaWtvb2wgeXJU",
-          "P2VrYWwgZWh0IGZvIGVtYW4gZWh0IHNpIHRhaFcgLnBwYSBwYW0gZXRpcm92YWYgcnVveSBubyBwdSB0aSBrb29sICxzZXRhbmlkcm9vYyB0Y2Vycm9jIGVodCBkbmlmIHVveSBlY25P"
+          "Try looking at the characters upside down, what can you see?",
+          "Once you find the correct coordinates, look it up on your favorite map app. What is the name of the lake?"
         ]
       },
       {
         id: "p2",
         title: "Paths for a Little Miracle",
-        expectedAnswer: "Rk8=",
+        expectedAnswer: "OF",
         hints: [
-          "LnBhbSBlaHQgbm8gbWVodCBldGFjb2wgZG5hIHNvdG9ocCBlaHQgbW9yZiBlY2FscCBoY2FlIHlmaXRuZWRJ",
-          "LmRlZW4gdW95IHJldHRlbCBlaHQgc2kgZXR1b3IgZWh0IGZvIGVwYWhzIGVoVCAuZGViaXJjc2VkIHNhIG1laHQgdGNlbm5vYyAsc2VjYWxwIGVodCBnbml0YWNvbCByZXRmQQ=="
+          "Identify each place from the photos and locate them on the map.",
+          "After locating the places, connect them as described. The shape of the route is the letter you need."
         ]
       },
       {
         id: "p3",
         title: "古声初启",
-        expectedAnswer: "RVZPTA==",
+        expectedAnswer: "LOVE",
         hints: [
-          "OuOAiuWFs+mbluOAieKAlOKAlOeahOS4gOmmlui+vuWQiOWPmOi/sOeahO+8jOaJvuWIsOacgOespuWQiOivjeS4remmmO+8jOWFq+minOivjeS4rQ==",
-          "LuaWh+iLseaIkOW+l+WIsOeahOWtl+e/u+ivkeaIkOiLseeUqOOAguWWhuWIsOacrOespuWQiOimgee0oOeahOivjeivjeWQju+8jOWwhuWFtuS4reiJgOacieeahOe6oeiJsuWBj+aXgemDqOmmluee7uWQiOi1t+adpe+8jOW+l+WIsOS4gOS4quWtl++8iOS4rei9o++8ie+8jOWwhuW+l+WIsOeahOWtl+e/u+ivkemHjeeLsOiLseeUqOOAgg=="
+          "在八首诗词中，找到最符合描述的一首——《关雎》。",
+          "找到最符合要求的诗词后，将其中所有的红色偏旁部首组合起来，得到一个字（繁体）。将得到的字翻译成英文。"
         ]
       },
       {
         id: "p4",
         title: "The Script of New Life",
-        expectedAnswer: "U01PT0xC",
+        expectedAnswer: "BLOOMS",
         hints: [
-          "LkdBQ1Qg4oaSIENUR0EgLGVscG1heGUgcm9GIC5yZW50cmFwIGxhdXRjYSBzdGkgb3RuaSBlc2FiIGhjYWUgdHJldm5vYyBvdCAoYXNyZXYgZWNpdiBkbmEgRyBoaGl3IEMgaGN0aXdzICxhc3JldiBhc3JldiBlY2l2IGRuYSBUIGh0aXcgQSBoY3RpdykgZ25pcmlhcCBlc2FiIHlscHBBIC5lY25ldXFlcyBBTkQgeXJhdG5lbWVscG1vYyBlmHQgdG5lc2VycGVyIHJvbG9jIGVzZWhUICAuVCDihpIgd29sbGVZICxHIOKGkiBuZWVyRyAsQyDihpIgZXVsQiAsQSDihpIgZGVSIDpzZXNhYiBBTkQgcnVvZiBlmHQgZm8gaGNhZSB5Zml0bmVkaSBvdCBwYW0gcm9sb2MgZWh0IGVzVSAgLic1IG90ICczIG1vcmYgc3JvbG9jIGVodCBkYWVyIGRuYSBkbmFydHMgZWh0IGZvIG5vaXRjZXJpZCBlmHQgd29sbG9G",
-          "Li4uKHRlYmFocGxhIGVodCBmbyByZXR0ZWwgaHQ3IOKGkiA3IOKGkiAxICsgMiArIDHDlDQgKyAww5YxNiA6KEcsIEMsIEEpIHRlbHBpcnQgOmVscG1heGUgcm9GIC5yZXR0ZWwgZ25pZG5vcHNlcnJvYyBlmHQgZG5pZiBvdCB0ZWJhaHBsYSBlmHQgbmkgbm9pdGlzb3AgZWh0IHNhICg2MuKAlDEpIHJlYm11biBnbml0bHVzZXIgZWh0IGVzVSAgLjMgPSBUICwyID0gRyAsMSA9IEMgLDAgPSBBIDpzZXVsYXYgZ25pd29sbG9mIGVodCBldmFoIHNlc2FiIEFORCBlmHQgIC5wdW9yZyBlmHQgbmkgZXNhYiBBTkQgZHIzICxkbmEgLGRuMiAsZHRzMSBlmHQgZm8gZXVsYXYgZWh0IGVyYSBaIGRuYSAsWSAsWCBlcmVodyAsMSArIFogK1nDlDQgK1jDljYxIDpnbmlzdSBldWxhdiBzdGkgZXR1cG1vYyAoWiAsWSAsWCkgdGVscGlydCBoY2FlfCByb0YgIC4oc3JldHRlbCBlZXJobCByZXAgcHVvcmcgZW5vKSBzdGVscGlydCBvdG5pIHNlc2FiIEFORCBlmHQgcHVvckcK"
+          "Follow the direction of the strand and read the colors from 3' to 5'. Use the color map to identify each of the four DNA bases: Red → A, Blue → C, Green → G, Yellow → T. These colors represent the complementary DNA sequence. Apply base pairing (switch A with T and vice versa, switch C with G and vice versa) to convert each base into its actual partner. For example, AGTC → TCAG.",
+          "Group the DNA bases into triplets (three letters per group). For each triplet (X, Y, Z), compute its value using: 16×X + 4×Y + Z + 1, where X, Y, and Z are the value of the 1st, 2nd, and 3rd DNA base in the group. The DNA bases have the following values: A = 0, C = 1, G = 2, T = 3. Use the resulting number (1–26) as the position of the letter in the alphabet to find the corresponding letter. For example: Triplet (A, C, G) → 16×0 + 4×1 + 2 + 1 = 7 → G (7th letter of the alphabet)."
         ]
       },
       {
         id: "p5",
         title: "A Moment in Time",
-        expectedAnswer: "V09O",
+        expectedAnswer: "NOW",
         hints: [
-          "LmVtaXQgZW1hcyBlmHQgb3QgdG5pb3AgZWh5VCAuKFRTRSkgZW5veiBmbyBlbWl0IHMnYXRuYWx0QSBvdCBrY29sYyBoY2FlIG5vIGVtaXQgZWh0IHRyZXZub0M=",
-          "LnJlYm11biBoY2FlIHJvZiBlZXMgbmFjIHVveSByZXR0ZWwgdGFodyBlZXMgZG5hIGVzaXdrbG9sYyBzZWVyZ2VkIDA5IG5ydVQgLigwcyBnbmlkYWVsIHRpbW8pIHRhbXJvZiBsYXRpZ2lkIG5pIHRpIGV0aXJ3IGRuYSBlbWl0IHRjZXJyb2MgZWh0IGRuaUY="
+          "Convert the time on each clock to Atlanta's time zone (EST). They point to the same time.",
+          "Find the correct time and write it in digital format (omit leading 0s). Turn 90 degrees clockwise and see what letter you can see for each number."
         ]
       },
       {
         id: "p6",
         title: "Puzzle Suite",
-        expectedAnswer: "Tkk=",
+        expectedAnswer: "IN",
         hints: [
-          "LnJldHRlbCBhIHRuZXNlcnBlciCExGFiIHNpbm5ldCBoY2FFIC5kcmFvYnllayBZVFJFV1EgYSB0YSBrb29sICxlbHp6dXAgdHNyaWYgZWh0IG5J",
-          "LnNyZXR0ZWwgZWh0IGh0aXcgZHJvdyBhIG1yb0YgLnNyZXR0ZWwgZWh0IGRhZXIgb3QgbGxhYiBrbmlwIGhjYWUgZm8gbm9pdGlzb3AgZWh0IGVzdSAsZWx6enVwIHRzcmlmIGVodCBuSQ==",
-          "LnNsbGFiIGVodCBubyBuZXR0aXJ3IGVyYSBzbGxhYiBsb29wIGVodCBmbyByZWJtdW4gZWhUICAuZXVsYXYgdG5pb3AgcmllmHQgc2kgKGtjYWxiIGRuYSAsm25pcCAsdWxiICxud29yYiAsbmVlcmcgLHdvbGxleSAsZGVyKSBzbGxhYiByZWtvb25zIGZvIHJlYm11biBlaFQgLnNlbHVyIGVtYWcgZWh0IG90IGduaWRyb2NjYSByZWJtdW4gdG5lcmVmZmlkIGEgdG5lc2VycGVyIGxsYWIgaGNhRSAsZWx6enVwIGRub2NlcyBlmHQgbkkK",
-          "LmRyb3cgZWh0IG5pIHJldHRlbCBlmHQgZm8gbm9pdGlzb3AgZWh0IHRlZyBvdCBsbGFiIGVodCBmbyByZWJtdW4gZWh0IGVzVSAuc3RvcHMgZGVyZWJtdW4gZXNvaHQgb3RuaSBzcmV0dGVsIGVodCB0dVAgLmRyb3cgZWh0IGRuaWYgb3Q=",
-          "LnNkcm93IHRyb2hzIG93dCB0Y2FydHhlIG90IHNyZXR0ZWwgZGV0aGdpbGhnaWggZWh0IHlsbm8gZWthVCAuZWx6enVwIGxhbmlmIGVodCBuSQ==",
-          "LnJld3NuYSBsYW5pZiBlmHQgbGFlmVyIG90IHNyZXR0ZWwgZGV0aGdpbGhnaWggZWh0IHRjYXJ0eEUgLmRyb3cgZHJpaHQgZWh0IHRlZyBkbmEgdGZvc29yY2lNIG1vcmYgc2VyYXd0Zm9zIGVjaWZmbyBldGlyb3ZhZiByduW5eSBsbGFjZXIgLGVsenp1cCBsYW5pZiBlmHQgbkkK"
+          "In the first puzzle, look at a QWERTY keyboard. Each tennis ball represent a letter.",
+          "In the first puzzle, use the position of each pink ball to read the letters. Form a word with the letters.",
+          "In the second puzzle, each ball represent a different number according to the game rules. The number of snooker balls (red, yellow, green, brown, blue, pink, and black) is their point value. The number of the poll balls are written on the balls.",
+          "In the second puzzle, use the number of the ball to get the position of the letter in the word. Put the letters into those numbered spots to find the word.",
+          "In the final puzzle, take only the highlighted letters from the first two answers to extract two short words.",
+          "In the final puzzle, recall your favorite office softwares from Microsoft and get the third word. Extract the highlighted letters to reveal the final answer."
         ]
       },
       {
         id: "p7",
         title: "Across Our Moments",
-        expectedAnswer: "WU5PTVJBSA==",
+        expectedAnswer: "HARMONY",
         hints: [
-          "Lm1laHQgZm8gbmV2ZXMgbGxhIHlmaXRuZWRJIC5yZXR0ZWwgbmVkZGloIGEgc25pYXRub2Mgb3RvaHAgaGNhRQ==",
-          "LnJld3NuYSBlmHQgbGxlcHMgeWVodCDigJQgcmVkcm8gbGFjaWdvbG9ub3JoYyBuaSBtZWh0IGRhZXIgZG5hIHNyZXR0ZWwgbmV2ZXMgbGxhIGRuaUY="
+          "Each photo contains a hidden letter. Identify all seven of them.",
+          "Find all seven letters and read them in chronological order — they spell the answer."
         ]
       }
     ];
@@ -876,10 +864,9 @@
         const state = puzzleState[p.id];
         const span = document.createElement("span");
         span.className = "word";
-        const answer = revealAnswer(p.expectedAnswer);
-        const len = answer.replace(/\s+/g, "").length;
+        const len = p.expectedAnswer.replace(/\s+/g, "").length;
         if (state.solved) {
-          span.textContent = answer.toUpperCase();
+          span.textContent = p.expectedAnswer.toUpperCase();
           span.classList.add(allSolved ? "all-completed" : "completed");
         } else {
           span.textContent = "_".repeat(len);
@@ -1022,7 +1009,7 @@
         hintLine.className = "hint-line";
         hintLine.dataset.hintTextFor = `${puzzle.id}-${i}`;
         if (state.usedHints[i]) {
-          hintLine.textContent = revealAnswer(puzzle.hints[i]) || "";
+          hintLine.textContent = puzzle.hints[i] || "";
           hintLine.classList.add("visible");
         }
         hintLinesBlock.appendChild(hintLine);
@@ -1118,7 +1105,7 @@
       }
 
       const normalizedInput = normalizeAnswer(raw);
-      const expected = normalizeAnswer(revealAnswer(puzzle.expectedAnswer));
+      const expected = normalizeAnswer(puzzle.expectedAnswer);
 
       state.lastAttemptAt = now;
       state.attempts += 1;
@@ -1186,7 +1173,7 @@
       state.usedHints[hintIndex] = true;
       state.hintsUsed += 1;
 
-      const text = revealAnswer(puzzle.hints[hintIndex]) || "Hint not configured.";
+      const text = puzzle.hints[hintIndex] || "Hint not configured.";
       hintLine.textContent = text;
       hintLine.classList.add("visible");
 
