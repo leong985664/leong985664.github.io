@@ -175,7 +175,7 @@
     }
 
     .intro-card {
-      flex: 1 1 280px;
+      flex: 1 1 450px;
       min-width: 0;
       border-radius: 20px;
       border: 1px solid rgba(148, 163, 184, 0.45);
@@ -211,7 +211,7 @@
     }
 
     .control-panel {
-      flex: 1 1 260px;
+      flex: 1 1 250px;
       min-width: 0;
       position: relative;
       z-index: 1;
@@ -224,6 +224,14 @@
       flex-direction: column;
       gap: 6px;
       flex-shrink: 0;
+    }
+
+    .control-subtitle {
+        font-size: 9px;
+        color: rgba(148, 163, 184, 0.75);
+        letter-spacing: 0.08em;
+        margin-top: -2px;
+        line-height: 1.3;
     }
 
     .control-main-row {
@@ -581,6 +589,29 @@
     .hint-line.visible {
       display: block;
     }
+
+    /* 新增样式：全部完成时的绿色 */
+    .all-completed {
+      color: #34d399;
+      text-shadow: 0 0 8px rgba(52, 211, 153, 0.7);
+    }
+
+    /* 新增样式：锁定状态 */
+    .pill.locked {
+      border-color: rgba(249, 115, 22, 0.85);
+      color: rgba(249, 115, 22, 0.85);
+      background: rgba(15, 23, 42, 0.9);
+      position: relative;
+    }
+
+    .pill.locked::before {
+      content: "🔒";
+      position: absolute;
+      left: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
@@ -598,8 +629,8 @@
 
       <div class="title-row">
         <h1>
-          Puzzle Lab for the Reveal
-          <span class="title-badge">双队计时解谜</span>
+          Puzzle Lab - A Journey Toward the Reveal
+          <span class="title-badge">Presented by Yulong Liang & Yeqing Kong</span>
         </h1>
       </div>
     </header>
@@ -639,8 +670,9 @@
               <div class="timer-display-main" id="timer-display">00:00</div>
             </div>
             <div class="timer-block">
-              <div class="control-label">总时间（含提示加时） · Total Time (with Hint Cost)</div>
+              <div class="control-label">总时间 · Total Time</div>
               <div class="timer-display-main" id="total-time-display">00:00</div>
+              <div class="control-subtitle">(包含提示加时 · Including Hint Cost)</div>
             </div>
             <div class="stats-block">
               <div class="control-label">已用提示 · Hints Used</div>
@@ -674,80 +706,92 @@
 
   <script>
     // =============================
-    // 配置区：七个谜题
+    // 加密/解密工具函数
+    // =============================
+    
+    function hideAnswer(str) {
+      return btoa(str.split('').reverse().join(''));
+    }
+
+    function revealAnswer(encoded) {
+      return atob(encoded).split('').reverse().join('');
+    }
+
+    // =============================
+    // 配置区：七个谜题（已加密）
     // =============================
 
     const puzzles = [
       {
         id: "p1",
         title: "Where Stories Joined",
-        expectedAnswer: "UNION",
+        expectedAnswer: "Tk9JTlU=",
         hints: [
-          "Try looking at the characters upside down, what can you see?",
-          "Once you find the correct numbers + letters, look it up on your favorite map app. What is the name of the lake?"
+          "P2VlcyB1b3kgbmFjIHRhaHcsIG53b2QgZWRpc3B1IHNyZXRjYXJhaGMgZWh0IHRhIGduaWtvb2wgeXJU",
+          "P2VrYWwgZWh0IGZvIGVtYW4gZWh0IHNpIHRhaFcgLnBwYSBwYW0gZXRpcm92YWYgcnVveSBubyBwdSB0aSBrb29sICxzZXRhbmlkcm9vYyB0Y2Vycm9jIGVodCBkbmlmIHVveSBlY25P"
         ]
       },
       {
         id: "p2",
         title: "Paths for a Little Miracle",
-        expectedAnswer: "OF",
+        expectedAnswer: "Rk8=",
         hints: [
-          "Identify each place from the photos and locate them on the map.",
-          "Connect the places as described. The shape of the path is the letter you need."
+          "LnBhbSBlaHQgbm8gbWVodCBldGFjb2wgZG5hIHNvdG9ocCBlaHQgbW9yZiBlY2FscCBoY2FlIHlmaXRuZWRJ",
+          "LmRlZW4gdW95IHJldHRlbCBlaHQgc2kgZXR1b3IgZWh0IGZvIGVwYWhzIGVoVCAuZGViaXJjc2VkIHNhIG1laHQgdGNlbm5vYyAsc2VjYWxwIGVodCBnbml0YWNvbCByZXRmQQ=="
         ]
       },
       {
         id: "p3",
         title: "古声初启",
-        expectedAnswer: "LOVE",
+        expectedAnswer: "RVZPTA==",
         hints: [
-          "在八首诗词中，找到最符合描述的一首——《关雎》。",
-          "找到最符合要求的诗词后，将其中所有的红色偏旁部首组合起来，得到一个字（繁体）。将得到的字翻译成英文。"
+          "OuOAiuWFs+mbluOAieKAlOKAlOeahOS4gOmmlui+vuWQiOWPmOi/sOeahO+8jOaJvuWIsOacgOespuWQiOivjeS4remmmO+8jOWFq+minOivjeS4rQ==",
+          "LuaWh+iLseaIkOW+l+WIsOeahOWtl+e/u+ivkeaIkOiLseeUqOOAguWWhuWIsOacrOespuWQiOimgee0oOeahOivjeivjeWQju+8jOWwhuWFtuS4reiJgOacieeahOe6oeiJsuWBj+aXgemDqOmmluee7uWQiOi1t+adpe+8jOW+l+WIsOS4gOS4quWtl++8iOS4rei9o++8ie+8jOWwhuW+l+WIsOeahOWtl+e/u+ivkemHjeeLsOiLseeUqOOAgg=="
         ]
       },
       {
         id: "p4",
         title: "The Script of New Life",
-        expectedAnswer: "BLOOMS",
+        expectedAnswer: "U01PT0xC",
         hints: [
-          "Follow the direction of the strand and **read the colors from 3' to 5'**.\n\nUse the color map to identify each of the four DNA bases:\n\n- **Red → A**\n- **Blue → C**\n- **Green → G**\n- **Yellow → T**\n\nThese colors represent the **complementary DNA sequence**.\n\nApply base pairing (**A↔T, C↔G**) to convert each base into its actual partner.\n\nFor example, **AGTC → TCAG**.",
-          "Group the DNA bases into **triplets** (three letters per group).\n\nFor each triplet (X, Y, Z), compute its value using: 16×X + 4×Y + Z + 1, where X, Y, and Z are the value of the 1st, 2nd, and 3rd DNA base in the group.\n\nThe DNA bases have the following values:\n\n- **A = 0**\n- **C = 1**\n- **G = 2**\n- **T = 3**\n\nUse the resulting number (1–26) as the position of the letter in the alphabet to find the corresponding letter.\n\nFor example:\n\n- Triplet **(A, C, G)** → **16×0 + 4×1 + 2 + 1 = 7**\n- **7 → G** (7th letter of the alphabet)"
+          "LkdBQ1Qg4oaSIENUR0EgLGVscG1heGUgcm9GIC5yZW50cmFwIGxhdXRjYSBzdGkgb3RuaSBlc2FiIGhjYWUgdHJldm5vYyBvdCAoYXNyZXYgZWNpdiBkbmEgRyBoaGl3IEMgaGN0aXdzICxhc3JldiBhc3JldiBlY2l2IGRuYSBUIGh0aXcgQSBoY3RpdykgZ25pcmlhcCBlc2FiIHlscHBBIC5lY25ldXFlcyBBTkQgeXJhdG5lbWVscG1vYyBlmHQgdG5lc2VycGVyIHJvbG9jIGVzZWhUICAuVCDihpIgd29sbGVZICxHIOKGkiBuZWVyRyAsQyDihpIgZXVsQiAsQSDihpIgZGVSIDpzZXNhYiBBTkQgcnVvZiBlmHQgZm8gaGNhZSB5Zml0bmVkaSBvdCBwYW0gcm9sb2MgZWh0IGVzVSAgLic1IG90ICczIG1vcmYgc3JvbG9jIGVodCBkYWVyIGRuYSBkbmFydHMgZWh0IGZvIG5vaXRjZXJpZCBlmHQgd29sbG9G",
+          "Li4uKHRlYmFocGxhIGVodCBmbyByZXR0ZWwgaHQ3IOKGkiA3IOKGkiAxICsgMiArIDHDlDQgKyAww5YxNiA6KEcsIEMsIEEpIHRlbHBpcnQgOmVscG1heGUgcm9GIC5yZXR0ZWwgZ25pZG5vcHNlcnJvYyBlmHQgZG5pZiBvdCB0ZWJhaHBsYSBlmHQgbmkgbm9pdGlzb3AgZWh0IHNhICg2MuKAlDEpIHJlYm11biBnbml0bHVzZXIgZWh0IGVzVSAgLjMgPSBUICwyID0gRyAsMSA9IEMgLDAgPSBBIDpzZXVsYXYgZ25pd29sbG9mIGVodCBldmFoIHNlc2FiIEFORCBlmHQgIC5wdW9yZyBlmHQgbmkgZXNhYiBBTkQgZHIzICxkbmEgLGRuMiAsZHRzMSBlmHQgZm8gZXVsYXYgZWh0IGVyYSBaIGRuYSAsWSAsWCBlcmVodyAsMSArIFogK1nDlDQgK1jDljYxIDpnbmlzdSBldWxhdiBzdGkgZXR1cG1vYyAoWiAsWSAsWCkgdGVscGlydCBoY2FlfCByb0YgIC4oc3JldHRlbCBlZXJobCByZXAgcHVvcmcgZW5vKSBzdGVscGlydCBvdG5pIHNlc2FiIEFORCBlmHQgcHVvckcK"
         ]
       },
       {
         id: "p5",
         title: "A Moment in Time",
-        expectedAnswer: "NOW",
+        expectedAnswer: "V09O",
         hints: [
-          "Convert the time on each clock to Atlanta’s time zone (EST). They point to the same time.",
-          "Find the correct time and write it in digital format (omit leading 0s). Turn 90 degrees clockwise and see what letter you can see for each number."
+          "LmVtaXQgZW1hcyBlmHQgb3QgdG5pb3AgZWh5VCAuKFRTRSkgZW5veiBmbyBlbWl0IHMnYXRuYWx0QSBvdCBrY29sYyBoY2FlIG5vIGVtaXQgZWh0IHRyZXZub0M=",
+          "LnJlYm11biBoY2FlIHJvZiBlZXMgbmFjIHVveSByZXR0ZWwgdGFodyBlZXMgZG5hIGVzaXdrbG9sYyBzZWVyZ2VkIDA5IG5ydVQgLigwcyBnbmlkYWVsIHRpbW8pIHRhbXJvZiBsYXRpZ2lkIG5pIHRpIGV0aXJ3IGRuYSBlbWl0IHRjZXJyb2MgZWh0IGRuaUY="
         ]
       },
       {
         id: "p6",
-        title: "Puzzle 365",
-        expectedAnswer: "IN",
+        title: "Puzzle Suite",
+        expectedAnswer: "Tkk=",
         hints: [
-          "In the first puzzle, look at a QWERTY keyboard. Each tennis ball represent a letter.",
-          "In the first puzzle, use the position of each pink ball to read the letters. Form a word with the letters.",
-          "In the second puzzle, each ball represent a different number according to the game rules. Snooker balls has the following numbers: red - 1, yellow - 2, green - 3, brown - 4, blue - 5, pink - 6, black - 7. Pool balls has the following numbers: 8-ball - 8, 9-ball - 9.",
-          "In the second puzzle, use the number of the ball to get the position of the letter in the word. Put the letters into those numbered spots to find the word.",
-          "In the final puzzle, take only the shaded letters from the first two answers to extract two short words.",
-          "In the final puzzle, recall your favorite office softwares from Microsoft and get the third word. Extract the shaded letters to reveal the final answer."
+          "LnJldHRlbCBhIHRuZXNlcnBlciCExGFiIHNpbm5ldCBoY2FFIC5kcmFvYnllayBZVFJFV1EgYSB0YSBrb29sICxlbHp6dXAgdHNyaWYgZWh0IG5J",
+          "LnNyZXR0ZWwgZWh0IGh0aXcgZHJvdyBhIG1yb0YgLnNyZXR0ZWwgZWh0IGRhZXIgb3QgbGxhYiBrbmlwIGhjYWUgZm8gbm9pdGlzb3AgZWh0IGVzdSAsZWx6enVwIHRzcmlmIGVodCBuSQ==",
+          "LnNsbGFiIGVodCBubyBuZXR0aXJ3IGVyYSBzbGxhYiBsb29wIGVodCBmbyByZWJtdW4gZWhUICAuZXVsYXYgdG5pb3AgcmllmHQgc2kgKGtjYWxiIGRuYSAsm25pcCAsdWxiICxud29yYiAsbmVlcmcgLHdvbGxleSAsZGVyKSBzbGxhYiByZWtvb25zIGZvIHJlYm11biBlaFQgLnNlbHVyIGVtYWcgZWh0IG90IGduaWRyb2NjYSByZWJtdW4gdG5lcmVmZmlkIGEgdG5lc2VycGVyIGxsYWIgaGNhRSAsZWx6enVwIGRub2NlcyBlmHQgbkkK",
+          "LmRyb3cgZWh0IG5pIHJldHRlbCBlmHQgZm8gbm9pdGlzb3AgZWh0IHRlZyBvdCBsbGFiIGVodCBmbyByZWJtdW4gZWh0IGVzVSAuc3RvcHMgZGVyZWJtdW4gZXNvaHQgb3RuaSBzcmV0dGVsIGVodCB0dVAgLmRyb3cgZWh0IGRuaWYgb3Q=",
+          "LnNkcm93IHRyb2hzIG93dCB0Y2FydHhlIG90IHNyZXR0ZWwgZGV0aGdpbGhnaWggZWh0IHlsbm8gZWthVCAuZWx6enVwIGxhbmlmIGVodCBuSQ==",
+          "LnJld3NuYSBsYW5pZiBlmHQgbGFlmVyIG90IHNyZXR0ZWwgZGV0aGdpbGhnaWggZWh0IHRjYXJ0eEUgLmRyb3cgZHJpaHQgZWh0IHRlZyBkbmEgdGZvc29yY2lNIG1vcmYgc2VyYXd0Zm9zIGVjaWZmbyBldGlyb3ZhZiByduW5eSBsbGFjZXIgLGVsenp1cCBsYW5pZiBlmHQgbkkK"
         ]
       },
       {
         id: "p7",
         title: "Across Our Moments",
-        expectedAnswer: "HARMONY",
+        expectedAnswer: "WU5PTVJBSA==",
         hints: [
-          "Each photo contains a hidden letter. Identify all seven of them.",
-          "Find all seven letters and read them in chronological order — they spell the answer."
+          "Lm1laHQgZm8gbmV2ZXMgbGxhIHlmaXRuZWRJIC5yZXR0ZWwgbmVkZGloIGEgc25pYXRub2Mgb3RvaHAgaGNhRQ==",
+          "LnJld3NuYSBlmHQgbGxlcHMgeWVodCDigJQgcmVkcm8gbGFjaWdvbG9ub3JoYyBuaSBtZWh0IGRhZXIgZG5hIHNyZXR0ZWwgbmV2ZXMgbGxhIGRuaUY="
         ]
       }
     ];
 
-    const MIN_INTERVAL_MS = 30 * 1000;
+    const MIN_INTERVAL_MS = 10 * 1000;
     const HINT_PENALTY_MS = 5 * 60 * 1000;
     const STORAGE_KEY = "genderRevealPuzzleState_v3";
 
@@ -758,7 +802,7 @@
         solved: false,
         attempts: 0,
         hintsUsed: 0,
-        usedHints: []   // 支持任意数量 hint
+        usedHints: []
       };
     });
 
@@ -825,15 +869,18 @@
       if (!bar) return;
       bar.innerHTML = "";
 
+      const allSolved = puzzles.every(p => puzzleState[p.id].solved);
+
       const frag = document.createDocumentFragment();
       puzzles.forEach(p => {
         const state = puzzleState[p.id];
         const span = document.createElement("span");
         span.className = "word";
-        const len = p.expectedAnswer.replace(/\s+/g, "").length;
+        const answer = revealAnswer(p.expectedAnswer);
+        const len = answer.replace(/\s+/g, "").length;
         if (state.solved) {
-          span.textContent = p.expectedAnswer.toUpperCase();
-          span.classList.add("completed");
+          span.textContent = answer.toUpperCase();
+          span.classList.add(allSolved ? "all-completed" : "completed");
         } else {
           span.textContent = "_".repeat(len);
         }
@@ -842,6 +889,11 @@
       });
 
       bar.appendChild(frag);
+
+      if (allSolved && timerIntervalId !== null) {
+        clearInterval(timerIntervalId);
+        timerIntervalId = null;
+      }
     }
 
     // =============================
@@ -852,6 +904,8 @@
       const state = puzzleState[puzzle.id];
       const card = document.createElement("article");
       card.className = "puzzle-card";
+
+      const isLocked = index > 0 && !puzzleState[puzzles[index - 1].id].solved;
 
       const header = document.createElement("div");
       header.className = "puzzle-header";
@@ -875,7 +929,10 @@
 
       const statusPill = document.createElement("div");
       statusPill.dataset.statusPillFor = puzzle.id;
-      if (state.solved) {
+      if (isLocked) {
+        statusPill.className = "pill locked";
+        statusPill.textContent = "🔒 Locked";
+      } else if (state.solved) {
         statusPill.className = "pill solved";
         statusPill.textContent = "Solved";
       } else {
@@ -928,7 +985,7 @@
       const feedback = document.createElement("div");
       feedback.className = "feedback";
       feedback.dataset.feedbackFor = puzzle.id;
-      feedback.textContent = ""; // 不显示默认句子
+      feedback.textContent = "";
 
       // 为每个 hint 生成一个按钮
       for (let i = 0; i < puzzle.hints.length; i++) {
@@ -936,8 +993,8 @@
         hb.className = "outline small";
 
         if (puzzle.id === "p6") {
-          const group = Math.floor(i / 2) + 1;  // 1,2,3
-          const sub = (i % 2) + 1;              // 1,2
+          const group = Math.floor(i / 2) + 1;
+          const sub = (i % 2) + 1;
           hb.textContent = `Hint ${group}.${sub}`;
         } else {
           hb.textContent = `Hint ${i + 1}`;
@@ -947,7 +1004,8 @@
         hb.dataset.hintIndex = String(i);
 
         const alreadyUsed = !!state.usedHints[i];
-        if (alreadyUsed) hb.disabled = true;
+        // 修改这里：如果题目已锁定、hint已使用或题目已解决，则禁用按钮
+        if (alreadyUsed || isLocked || state.solved) hb.disabled = true;
 
         hb.addEventListener("click", () => handleHintClick(puzzle.id, i));
         hintButtonsBox.appendChild(hb);
@@ -964,7 +1022,7 @@
         hintLine.className = "hint-line";
         hintLine.dataset.hintTextFor = `${puzzle.id}-${i}`;
         if (state.usedHints[i]) {
-          hintLine.textContent = puzzle.hints[i] || "";
+          hintLine.textContent = revealAnswer(puzzle.hints[i]) || "";
           hintLine.classList.add("visible");
         }
         hintLinesBlock.appendChild(hintLine);
@@ -976,7 +1034,14 @@
       card.appendChild(header);
       card.appendChild(body);
 
-      if (state.solved) {
+      // 处理锁定和已解决状态
+      if (isLocked) {
+        input.disabled = true;
+        checkBtn.disabled = true;
+        feedback.textContent = "前面的题目需要先解决才能解锁 · Previous puzzle must be solved first to unlock.";
+        feedback.className = "feedback info";
+        card.style.opacity = "0.6";
+      } else if (state.solved) {
         input.disabled = true;
         checkBtn.disabled = true;
         feedback.textContent = "这一题已经解出来啦 · Already solved.";
@@ -1053,7 +1118,7 @@
       }
 
       const normalizedInput = normalizeAnswer(raw);
-      const expected = normalizeAnswer(puzzle.expectedAnswer);
+      const expected = normalizeAnswer(revealAnswer(puzzle.expectedAnswer));
 
       state.lastAttemptAt = now;
       state.attempts += 1;
@@ -1078,9 +1143,10 @@
 
         saveStateToStorage();
         renderPhraseBar();
+        renderPuzzleList();
       } else {
         feedback.textContent =
-          "暂时不对，冷却结束后再试一次 · That doesn’t quite match. Try again after the cooldown.";
+          "暂时不对，冷却结束后再试一次 · That doesn't quite match. Try again after the cooldown.";
         feedback.className = "feedback error";
       }
     }
@@ -1117,16 +1183,15 @@
         return;
       }
 
-      // 不限制总次数，同一个 hint 只算一次
       state.usedHints[hintIndex] = true;
       state.hintsUsed += 1;
 
-      const text = puzzle.hints[hintIndex] || "Hint not configured.";
+      const text = revealAnswer(puzzle.hints[hintIndex]) || "Hint not configured.";
       hintLine.textContent = text;
       hintLine.classList.add("visible");
 
       hintBtn.disabled = true;
-      hintsSpan.textContent = `Hints: ${state.hintsUsed}`;
+      hintsSpan.textContent = `Hints Used: ${state.hintsUsed}`;
 
       feedback.textContent =
         "已使用提示，总时间已增加 5 分钟 · Hint used. +5 minutes added to total time.";
